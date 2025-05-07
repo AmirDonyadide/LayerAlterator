@@ -1,0 +1,16 @@
+Data/
+├── ucps/                    # Urban Canopy Parameters resampled to 20m, normalized [0-1]
+│   ├── TCH.tif               # Tree Canopy Height 
+│   ├── IMD.tif               # Impervious Surface Density
+│   ├── BH.tif                # Building Height
+│   ├── BSF.tif               # Building Surface Fraction
+│   ├── SVF.tif               # Sky View Factor
+│
+├── lc_fractions/            # Land cover fractions [0-1] Spectral unmixing from Sentinel-2
+│   ├── F_AC.tif              # Asphalt/concrete fraction
+│   ├── F_S.tif               # Shingle roof fraction
+│   ├── F_M.tif               # Metal roof fraction
+│   ├── F_BS.tif              # Bare soil/sand fraction
+│   ├── F_G.tif               # Low vegetation/grass fraction
+│   ├── F_TV.tif              # Tall vegetation fraction
+│   ├── F_W.tif               # Water fraction
