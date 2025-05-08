@@ -127,7 +127,7 @@ Politecnico di Milano
 
 ## 🧑‍💻 Supervisor
 
-**Daniele Oxoli**  
+**Dr. Daniele Oxoli**  
 Politecnico di Milano
 [GitHub Profile →](https://github.com/danioxoli)
 
