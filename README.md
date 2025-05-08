@@ -15,11 +15,11 @@ This tool processes raster datasets by applying either **proportional variations
 ```bash
 LayerAlterator/
 ├── test_data/
-│   └── test_data_final/
-│       ├── lc_fractions/        # Input raster layers (GeoTIFFs)
-│       ├── ucps/                # UCP layers (optional extension)
-│       ├── sample_mask.geojson  # Vector mask
-│       └── operation_rules.json # Configuration rules
+│   |
+│   ├── lc_fractions/        # Input raster layers (GeoTIFFs)
+│   ├── ucps/                # UCP layers (optional extension)
+│   ├── sample_mask.geojson  # Vector mask
+│   └── operation_rules.json # Configuration rules
 ├── output/                      # Output folder for modified rasters
 ├── test_layer_sim.ipynb         # Jupyter Notebook for testing and demonstration
 ├── requirements.txt
@@ -83,9 +83,9 @@ pip install -r requirements.txt
 from layer_alterator import layer_alterator
 
 layer_alterator(
-    raster_folder="./test_data/test_data_final/lc_fractions",
-    vector_path="./test_data/test_data_final/sample_mask.geojson",
-    operation_rule_path="./test_data/test_data_final/operation_rules.json",
+    raster_folder="./test_data/lc_fractions",
+    vector_path="./test_data/sample_mask.geojson",
+    operation_rule_path="./test_data/operation_rules.json",
     output_folder="./output/modified_raster/new_data",
     value_range=(0, 1)
 )
