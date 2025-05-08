@@ -118,9 +118,9 @@ Open `test_layer_sim.ipynb` to run the full workflow interactively and inspect o
 
 ## 🧑‍💻 Author
 
-**Amir Donyadide**  
+**Amirhossein Donyadidegan**  
 MSc Geoinformatics Engineering  
-Politecnico di Milano  
+Politecnico di Milano    
 [GitHub Profile →](https://github.com/AmirDonyadide)
 
 ---
