@@ -15,7 +15,7 @@ This tool processes raster datasets by applying either **proportional variations
 ```bash
 LayerAlterator/
 ├── test_data/
-│   |
+│   │
 │   ├── lc_fractions/        # Input raster layers (GeoTIFFs)
 │   ├── ucps/                # UCP layers (optional extension)
 │   ├── sample_mask.geojson  # Vector mask
