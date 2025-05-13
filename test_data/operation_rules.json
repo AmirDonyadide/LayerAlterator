@@ -4,11 +4,11 @@
     "BH.tif": null,
     "BSF.tif": "pct",
     "SVF.tif": null,
-    "F_AC.tif": "replace",
-    "F_S.tif": "replace",
-    "F_M.tif": "replace",
-    "F_BS.tif": null,
-    "F_G.tif": null,
-    "F_TV.tif": null,
-    "F_W.tif": null
+    "F_AC.tif": "pct",
+    "F_S.tif": "pct",
+    "F_M.tif": "pct",
+    "F_BS.tif": "pct",
+    "F_G.tif": "pct",
+    "F_TV.tif": "pct",
+    "F_W.tif":"pct"
 }
