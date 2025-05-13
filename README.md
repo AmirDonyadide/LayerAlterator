@@ -1,17 +1,28 @@
-# 🚀 LayerAlterator
+# 🛰️ LayerAlterator
 
-A Python-based geospatial tool for modifying raster layers using vector-defined zones and attribute-driven rules. Designed for spatial simulations where input maps need to be programmatically altered based on scenario definitions (e.g. urban expansion, vegetation removal, land cover redistribution).
+**LayerAlterator** is a Python-based geospatial simulation tool for programmatically modifying raster datasets within vector-defined zones, based on attribute-driven rules. It’s tailored for use in urban planning, climate adaptation modeling, and land cover change simulation.
 
 ---
 
 ## 📌 Overview
 
-This tool processes raster datasets by applying either **proportional variations** (`"pct"`) or **value replacement** (`"replace"`) within vector-defined polygons, using per-layer configuration defined in a JSON file. It supports batch processing of multiple raster files and ensures values stay within a specified numeric range.
+This tool processes raster datasets using spatial rules defined in a vector mask (GeoJSON/GPKG). Each raster is altered according to per-layer configurations provided in a JSON file, enabling two main types of operations:
 
-- Enforces that all land cover (LC) fraction layers (`F_*.tif`) use the same operation type (`"pct"` or `"replace"`) and validates their structure.
-- Automatically balances LC fractions when using `"pct"`, so that the sum per pixel remains exactly 1.
-- Validates that LC fractions under `"replace"` sum to a maximum of 1 per polygon.
-- Urban Climate Parameters (UCPs) allow flexible rules (`"replace"`, `"pct"`, or `null`) without inter-parameter constraints.
+- **`"pct"`**: Applies proportional (percentage-based) changes with automatic balancing.
+- **`"replace"`**: Replaces values directly as defined by attributes in the mask.
+
+Special features include validation and balancing logic for land cover (LC) fractions and optional support for modifying Urban Climate Parameters (UCPs). Output rasters are clipped to remain within a specified numeric range (default: 0–1).
+
+---
+
+## 🔍 Key Features
+
+✅ Raster modification driven by vector attribute rules  
+✅ Batch processing of multiple layers  
+✅ Intelligent handling of LC fractions (`F_*.tif`) with sum constraints  
+✅ Skipping of rasters with missing or `null` rules  
+✅ JSON-based configuration for flexible simulation scenarios  
+✅ Format support: `.tif`, `.tiff` rasters; `.geojson`, `.gpkg` vectors  
 
 ---
 
@@ -20,45 +31,35 @@ This tool processes raster datasets by applying either **proportional variations
 ```bash
 LayerAlterator/
 ├── test_data/
-│   │
 │   ├── lc_fractions/        # Input raster layers (GeoTIFFs)
-│   ├── ucps/                # UCP layers (optional extension)
-│   ├── sample_mask.geojson  # Vector mask
-│   └── operation_rules.json # Configuration rules
+│   ├── ucps/                # UCP layers (optional)
+│   ├── sample_mask.geojson  # Vector mask with simulation attributes
+│   └── operation_rules.json # Configuration for each raster layer
 ├── output/                      # Output folder for modified rasters
-├── test_layer_sim.ipynb         # Jupyter Notebook for testing and demonstration
-├── requirements.txt
-├── README.md
-└── .gitignore
+├── test_layer_sim.ipynb         # Interactive Jupyter Notebook example
+├── layer_alterator.py           # Core Python script
+├── requirements.txt             # Python dependencies
+├── README.md                    # Project documentation
+└── .gitignore                   # Ignored files and folders
 ```
 
 ---
 
-## ⚙️ Functionality
-
-- ✅ Applies spatial edits using geometry masks from a GeoJSON or GPKG file
-- ✅ Automatically matches each raster to an attribute in the vector file
-- ✅ Reads simulation rules (`"pct"` or `"replace"`) from a JSON file
-- ✅ Clips output pixel values to a safe user-defined range (default: 0–1)
-- ✅ Validates land cover rules for sum constraints and mode consistency
-- ✅ Applies balancing logic for `"pct"` mode to maintain LC fraction totals
-- ✅ Skips rasters with `null` rules or missing vector attributes
-
----
-
-## 📥 Input Files
+## 📥 Input Data Structure
 
 ### 🌍 Raster Layers
 
 - Format: `.tif` or `.tiff`
-- One file per covariate layer (e.g., `F_AC.tif`, `IMD.tif`, etc.)
+- Naming: Each filename must match a column name in the vector mask (case-insensitive, without extension)
+- Example: `F_AC.tif` → `F_AC` column in vector
 
-### 🗂️ Vector Mask
+### 🗺️ Vector Mask
 
 - Format: `.geojson` or `.gpkg`
-- Must contain columns named after the raster filenames (uppercased, without extension)
+- Geometry type: Polygons
+- Attributes: One column per raster, named after the raster filename (uppercase, no extension)
 
-### 🧾 Operation Rules (JSON)
+### ⚙️ Operation Rules (JSON)
 
 ```json
 {
@@ -68,23 +69,44 @@ LayerAlterator/
 }
 ```
 
-- Keys: Raster filenames
-- Values:
-  - `"pct"` – Apply a percentage-based variation (with balancing)
-  - `"replace"` – Apply a fixed value replacement
-  - `null` – Skip this layer
+- `"replace"`: Replace values directly based on polygon attributes  
+- `"pct"`: Apply proportional adjustment (automatically balanced)  
+- `null`: Skip the raster layer  
 
 ---
 
-## 🚀 Usage
+## ⚙️ Functionality Details
 
-### 📦 Installation
+### Land Cover Fractions (`F_*.tif`)
+
+- `"pct"`: Balancing logic ensures per-pixel sum remains 1  
+- `"replace"`: Total value across LC fractions must not exceed 1 (validated)
+
+### Urban Climate Parameters (UCPs)
+
+- Rules can be `"replace"`, `"pct"`, or `null`
+- No inter-parameter validation (yet)
+
+### Raster Operations
+
+- Reads each raster and overlays it with relevant polygons
+- Identifies matching attributes by filename
+- Applies rules per-pixel using the polygon’s attribute values
+- Clips final raster to specified numeric range
+
+---
+
+## 🚀 Quick Start
+
+### 🧰 Installation
 
 ```bash
+git clone https://github.com/AmirDonyadide/LayerAlterator.git
+cd LayerAlterator
 pip install -r requirements.txt
 ```
 
-### ▶️ Running the Script
+### ▶️ Python Script Usage
 
 ```python
 from layer_alterator import layer_alterator
@@ -98,15 +120,19 @@ layer_alterator(
 )
 ```
 
-### 📓 Alternatively, Use the Jupyter Notebook
+### 📓 Notebook Interface
 
-Open `test_layer_sim.ipynb` to run the full workflow interactively and inspect outputs.
+Use the provided `test_layer_sim.ipynb` Jupyter notebook for:
+
+- Loading input layers
+- Visualizing changes
+- Running simulations interactively
 
 ---
 
-## 🧪 Example Output
+## 🧪 Sample Output
 
-```text
+```bash
 [SKIP] No operation rule for 'F_W.tif'
 [DONE] Modified F_S.tif with 'replace' → ./output/modified_raster/new_data/F_S.tif
 [DONE] Modified F_AC.tif with 'replace' → ./output/modified_raster/new_data/F_AC.tif
@@ -114,12 +140,22 @@ Open `test_layer_sim.ipynb` to run the full workflow interactively and inspect o
 
 ---
 
-## 🔧 Future Improvements
+## 💡 Applications
 
-- Add CLI interface for command-line usage
-- Support for `.shp` vector files and `.vrt` raster stacks
-- Expand UCP rule validations (e.g., `BF ≤ IMP`)
-- Optional correction for small inconsistencies
+- Urban growth simulation  
+- Vegetation and land cover modeling  
+- Environmental impact assessments  
+- Climate-sensitive parameter tuning (e.g. albedo, thermal conductivity)
+
+---
+
+## 🧰 Development Roadmap
+
+- [ ] Command-line interface (CLI) support
+- [ ] `.shp` vector support
+- [ ] `.vrt` stack raster support
+- [ ] UCP logical validations (e.g., `BF ≤ IMP`)
+- [ ] GUI for visual rule editing (planned)
 
 ---
 
@@ -128,18 +164,19 @@ Open `test_layer_sim.ipynb` to run the full workflow interactively and inspect o
 **Amirhossein Donyadidegan**  
 MSc Geoinformatics Engineering  
 Politecnico di Milano  
-[GitHub Profile →](https://github.com/AmirDonyadide)
+📫 [GitHub](https://github.com/AmirDonyadide) | 📍 Karlsruhe / Milano
 
 ---
 
 ## 🧑‍🏫 Supervisor
 
 **Dr. Daniele Oxoli**  
-Politecnico di Milano  
-[GitHub Profile →](https://github.com/danioxoli)
+Assistant Professor, Politecnico di Milano  
+🌐 [GitHub](https://github.com/danioxoli)
 
 ---
 
 ## 📄 License
 
-This project is released under the MIT License.
+This project is licensed under the **MIT License**.  
+See the [LICENSE](LICENSE) file for details.
