@@ -15,7 +15,7 @@ This tool processes raster datasets by applying either **proportional variations
 ```bash
 LayerAlterator/
 ├── test_data/
-│   |
+│   │
 │   ├── lc_fractions/        # Input raster layers (GeoTIFFs)
 │   ├── ucps/                # UCP layers (optional extension)
 │   ├── sample_mask.geojson  # Vector mask
@@ -118,16 +118,16 @@ Open `test_layer_sim.ipynb` to run the full workflow interactively and inspect o
 
 ## 🧑‍💻 Author
 
-**Amir Donyadide**  
+**Amirhossein Donyadidegan**  
 MSc Geoinformatics Engineering  
-Politecnico di Milano  
+Politecnico di Milano    
 [GitHub Profile →](https://github.com/AmirDonyadide)
 
 ---
 
 ## 🧑‍💻 Supervisor
 
-**Daniele Oxoli**  
+**Dr. Daniele Oxoli**  
 Politecnico di Milano
 [GitHub Profile →](https://github.com/danioxoli)
 
