@@ -35,9 +35,7 @@ LayerAlterator/
 │   ├── ucps/                # UCP layers (optional)
 │   ├── sample_mask.geojson  # Vector mask with simulation attributes
 │   └── operation_rules.json # Configuration for each raster layer
-├── output/                      # Output folder for modified rasters
 ├── test_layer_sim.ipynb         # Interactive Jupyter Notebook example
-├── layer_alterator.py           # Core Python script
 ├── requirements.txt             # Python dependencies
 ├── README.md                    # Project documentation
 └── .gitignore                   # Ignored files and folders
