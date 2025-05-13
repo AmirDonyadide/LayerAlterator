@@ -35,7 +35,7 @@ LayerAlterator/
 │   ├── ucps/                # UCP layers (optional)
 │   ├── sample_mask.geojson  # Vector mask with simulation attributes
 │   └── operation_rules.json # Configuration for each raster layer
-├── test_layer_sim.ipynb         # Interactive Jupyter Notebook example
+├── LayerAlterator.ipynb         # Interactive Jupyter Notebook example
 ├── requirements.txt             # Python dependencies
 ├── README.md                    # Project documentation
 └── .gitignore                   # Ignored files and folders
@@ -120,7 +120,7 @@ layer_alterator(
 
 ### 📓 Notebook Interface
 
-Use the provided `test_layer_sim.ipynb` Jupyter notebook for:
+Use the provided `LayerAlterator.ipynb` Jupyter notebook for:
 
 - Loading input layers
 - Visualizing changes
