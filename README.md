@@ -1,4 +1,4 @@
-# 🛰️ LayerAlterator
+# 🚀 LayerAlterator
 
 A Python-based geospatial tool for modifying raster layers using vector-defined zones and attribute-driven rules. Designed for spatial simulations where input maps need to be programmatically altered based on scenario definitions (e.g. urban expansion, vegetation removal, land cover redistribution).
 
@@ -7,6 +7,11 @@ A Python-based geospatial tool for modifying raster layers using vector-defined 
 ## 📌 Overview
 
 This tool processes raster datasets by applying either **proportional variations** (`"pct"`) or **value replacement** (`"replace"`) within vector-defined polygons, using per-layer configuration defined in a JSON file. It supports batch processing of multiple raster files and ensures values stay within a specified numeric range.
+
+- Enforces that all land cover (LC) fraction layers (`F_*.tif`) use the same operation type (`"pct"` or `"replace"`) and validates their structure.
+- Automatically balances LC fractions when using `"pct"`, so that the sum per pixel remains exactly 1.
+- Validates that LC fractions under `"replace"` sum to a maximum of 1 per polygon.
+- Urban Climate Parameters (UCPs) allow flexible rules (`"replace"`, `"pct"`, or `null`) without inter-parameter constraints.
 
 ---
 
@@ -35,13 +40,15 @@ LayerAlterator/
 - ✅ Automatically matches each raster to an attribute in the vector file
 - ✅ Reads simulation rules (`"pct"` or `"replace"`) from a JSON file
 - ✅ Clips output pixel values to a safe user-defined range (default: 0–1)
-- ✅ Skips rasters with no rule or missing attribute column
+- ✅ Validates land cover rules for sum constraints and mode consistency
+- ✅ Applies balancing logic for `"pct"` mode to maintain LC fraction totals
+- ✅ Skips rasters with `null` rules or missing vector attributes
 
 ---
 
 ## 📥 Input Files
 
-### 🗺️ Raster Layers
+### 🌍 Raster Layers
 
 - Format: `.tif` or `.tiff`
 - One file per covariate layer (e.g., `F_AC.tif`, `IMD.tif`, etc.)
@@ -63,7 +70,7 @@ LayerAlterator/
 
 - Keys: Raster filenames
 - Values:
-  - `"pct"` – Apply a percentage-based reduction
+  - `"pct"` – Apply a percentage-based variation (with balancing)
   - `"replace"` – Apply a fixed value replacement
   - `null` – Skip this layer
 
@@ -111,24 +118,24 @@ Open `test_layer_sim.ipynb` to run the full workflow interactively and inspect o
 
 - Add CLI interface for command-line usage
 - Support for `.shp` vector files and `.vrt` raster stacks
-- Post-processing validation controller (e.g., sum of land cover fractions = 1)
+- Expand UCP rule validations (e.g., `BF ≤ IMP`)
 - Optional correction for small inconsistencies
 
 ---
 
-## 🧑‍💻 Author
+## 🧑‍💼 Author
 
 **Amirhossein Donyadidegan**  
 MSc Geoinformatics Engineering  
-Politecnico di Milano    
+Politecnico di Milano  
 [GitHub Profile →](https://github.com/AmirDonyadide)
 
 ---
 
-## 🧑‍💻 Supervisor
+## 🧑‍🏫 Supervisor
 
 **Dr. Daniele Oxoli**  
-Politecnico di Milano
+Politecnico di Milano  
 [GitHub Profile →](https://github.com/danioxoli)
 
 ---
