@@ -258,6 +258,71 @@ Resulting rasters are saved with the suffix `_mask.tif` in the `./output` direct
 **Why this matters:**  
 This step allows per-polygon attribute values to directly overwrite raster pixels. It is used in planning scenarios where each land unit is prescribed a deterministic outcome.
 
+### E) Apply Percentage Change Rule
+
+This step adjusts raster values based on percentage change rules defined in the vector attributes. It applies when the rule classification is **C2** or **C3**.
+
+
+#### E.1) Identify Fraction Layers
+
+Function: `is_fraction_layer(layer_name)`
+
+Checks whether a given raster layer is a fractional land cover layer. These are identified by the prefix `F_`.
+
+
+#### E.2) Apply Percentage to UCP Layers
+
+Function: `apply_pct_ucp(...)`
+
+This function updates a single UCP raster layer by applying percentage-based modifications defined in the vector attributes.
+
+Key features:
+- Each polygon provides a % value that is applied within its area.
+- Supports various handling options for:
+  - **Zero values** (`preserve` or `raise`)
+  - **Out-of-bound results** (`clip`, `normalize`, `ignore`)
+- Ensures NoData pixels remain unchanged.
+
+Example:
+
+```python
+factor = 1 + (pct_value / 100.0)
+data = np.where(update_mask, data * factor, data)
+```
+
+
+#### E.3) Apply Percentage to Fraction Layers (with Normalization)
+
+Function: `apply_pct_all_fractions(...)`
+
+- Loads all fraction rasters (`F_*`) into memory.
+- Applies the polygon-wise percentage changes per layer.
+- After modification, pixel values are normalized to ensure all fraction values sum to 1.0 per pixel.
+
+This guarantees valid fraction outputs and prevents distortion caused by imbalanced updates.
+
+
+#### E.4) Orchestrate All Percentage Updates
+
+Function: `apply_pct_all(...)`
+
+Coordinates the update of:
+- **UCP layers**: individually processed via `apply_pct_ucp()`
+- **Fraction layers**: jointly processed and normalized via `apply_pct_all_fractions()`
+
+This function is called only if the detected rule type is C2 or C3:
+
+```python
+if rule_id in {"C2", "C3"}:
+    apply_pct_all(gdf_mask, rules, ucp_folder, fractions_folder, output_folder)
+```
+
+Output raster files are saved using the `_pct.tif` suffix in the `./output` folder.
+
+
+**Why this matters:**  
+This mechanism supports spatially variable simulation of urban or ecological changes, ensuring controlled and balanced modifications across layers.
+
 ---
 
 ## ⚙️ Functionality Details
