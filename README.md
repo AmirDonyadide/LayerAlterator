@@ -45,6 +45,87 @@ This section imports all the necessary Python libraries required for geospatial 
 
 > These libraries form the foundation of the layer simulator and enable seamless integration of vector attributes into raster processing workflows.
 
+### B) Import Input Data
+
+This section prepares all necessary input files for the simulation process, including vector masks, raster layers, operational rules, and the output path.
+
+#### B.1) Load Vector Mask
+
+The vector mask defines spatial units (polygons) that carry the attributes needed to control how raster layers will be processed.
+
+Supported formats include:
+- `.gpkg` (GeoPackage)
+- `.geojson` / `.json` (GeoJSON)
+- `.shp` (Shapefile)
+
+The code automatically detects the format and reads the file using `GeoPandas`:
+
+```python
+vector_mask_path = "./vector_pct.geojson"
+if vector_mask_path.endswith(".gpkg"):
+    vector_mask_layer = "layer_name"
+    gdf_mask = gpd.read_file(vector_mask_path, layer=vector_mask_layer)
+elif vector_mask_path.endswith(".geojson") or vector_mask_path.endswith(".json"):
+    gdf_mask = gpd.read_file(vector_mask_path)
+elif vector_mask_path.endswith(".shp"):
+    gdf_mask = gpd.read_file(vector_mask_path)
+else:
+    raise ValueError("Unsupported vector format. Use GPKG, GeoJSON, or Shapefile.")
+```
+
+**Output:** A `GeoDataFrame` named `gdf_mask` containing the geometries and attributes used in the simulation.
+
+#### B.2) Define Covariate Layer Folders
+
+The code expects two folders containing raster layers:
+- `./ucps/`: Urban Conversion Parameter (UCP) rasters such as `IMD.tif`, `BSF.tif`, etc.
+- `./lc_fractions/`: Fractional land cover layers, all prefixed with `F_`, such as `F_AC.tif`, `F_UF.tif`, etc.
+
+These paths are defined as:
+
+```python
+ucp_folder = "./ucps"
+fractions_folder = "./lc_fractions"
+```
+
+#### B.3) Load JSON Rule File
+
+Rules for processing each raster layer are defined in a JSON file. Each entry in the file maps a raster filename to one of the following rule types:
+- `"mask"`: apply fixed value from the vector attribute
+- `"pct"`: apply percentage-based modification
+- `"none"`: skip processing
+
+Example JSON content:
+
+```json
+{
+  "F_AC.tif": "mask",
+  "F_UF.tif": "mask",
+  "IMD.tif": "pct",
+  "BSF.tif": "pct"
+}
+```
+
+Loading the file in Python:
+
+```python
+rules_path = "./operation_rules_C3.json"
+with open(rules_path) as f:
+    rules = json.load(f)
+```
+
+**Output:** A `dict` named `rules` mapping each raster layer to its processing type.
+
+#### B.4) Set Output Folder
+
+Processed rasters will be saved into the specified output folder. The folder is created later in the workflow if it does not already exist:
+
+```python
+output_folder = "./output"
+```
+
+**Output:** A path where the final masked or adjusted raster layers will be written.
+
 ---
 
 ## ⚙️ Functionality Details
