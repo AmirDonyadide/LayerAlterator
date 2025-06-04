@@ -162,22 +162,7 @@ This function determines the processing category for the simulation based on the
 
 **Why this matters:** It ensures that the per-polygon rules are logically and numerically valid before applying them to raster data.
 
-
-#### C.3) Execute Rule Validation
-
-Code block to invoke the above logic:
-
-```python
-check_crs_match(gdf_mask, rules, ucp_folder, fractions_folder)
-
-try:
-    rule_id, parsed_info = parse_rules_from_mask(gdf_mask, rules)
-except ValueError as e:
-    print("Rule validation failed:", e)
-    raise
-```
-
-If the check passes, `rule_id` is used to direct the next phase of processing.
+the check passes, `rule_id` is used to direct the next phase of processing.
 
 ### D) Apply Mask Rule
 
