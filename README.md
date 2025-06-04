@@ -24,6 +24,18 @@
 
 ### A) Import Libraries
 
+```python
+import os
+import json
+import geopandas as gpd
+import pandas as pd
+import rasterio
+import numpy as np
+from rasterio.mask import mask
+from rasterio.features import rasterize
+from shapely.geometry import mapping
+```
+
 This section imports all the necessary Python libraries required for geospatial raster-vector operations, numerical computations, and file handling.
 
 #### Standard Libraries
@@ -61,7 +73,6 @@ Supported formats include:
 The code automatically detects the format and reads the file using `GeoPandas`:
 
 ```python
-vector_mask_path = "./vector_pct.geojson"
 if vector_mask_path.endswith(".gpkg"):
     vector_mask_layer = "layer_name"
     gdf_mask = gpd.read_file(vector_mask_path, layer=vector_mask_layer)
