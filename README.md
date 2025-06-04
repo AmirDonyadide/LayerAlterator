@@ -82,13 +82,6 @@ The code expects two folders containing raster layers:
 - `./ucps/`: Urban Conversion Parameter (UCP) rasters such as `IMD.tif`, `BSF.tif`, etc.
 - `./lc_fractions/`: Fractional land cover layers, all prefixed with `F_`, such as `F_AC.tif`, `F_UF.tif`, etc.
 
-These paths are defined as:
-
-```python
-ucp_folder = "./ucps"
-fractions_folder = "./lc_fractions"
-```
-
 #### B.3) Load JSON Rule File
 
 Rules for processing each raster layer are defined in a JSON file. Each entry in the file maps a raster filename to one of the following rule types:
@@ -126,8 +119,6 @@ output_folder = "./output"
 ```
 
 **Output:** A path where the final masked or adjusted raster layers will be written.
-
-
 
 ### C) Parse Vector Mask Attributes and Check Rules
 
