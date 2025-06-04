@@ -137,6 +137,70 @@ output_folder = "./output"
 
 **Output:** A path where the final masked or adjusted raster layers will be written.
 
+### C) Parse Vector Mask Attributes and Check Rules
+
+This step validates that all input data aligns spatially and logically before performing raster processing.
+
+---
+
+#### C.1) Check CRS Consistency
+
+Function: `check_crs_match(gdf, rules, ucp_folder, fractions_folder)`
+
+This function verifies that the Coordinate Reference System (CRS) of every raster layer matches the CRS of the input vector file (`gdf`).
+
+- For each layer listed in the rule file:
+  - Open the corresponding raster.
+  - Compare its CRS with the vector mask.
+  - Log any mismatches.
+
+**Why this matters:** Spatial misalignment can lead to incorrect rasterization or masking.
+
+---
+
+#### C.2) Parse and Validate Rules
+
+Function: `parse_rules_from_mask(gdf, rules)`
+
+This function determines the processing category for the simulation based on the content of the rules JSON file and the attributes found in each polygon.
+
+##### Supported Rule Categories:
+
+- **C0**: All layers set to `"none"` → no processing required.
+- **C1**: All layers set to `"mask"` → must validate:
+  - **C1.1**: All values (UCP + fraction) must be within [0, 1].
+  - **C1.2**: `IMD ≥ BSF` per polygon.
+  - **C1.3**: Sum of all `F_` fraction values per polygon must equal 1.0.
+- **C2**: All layers set to `"pct"` → apply uniform percentage change.
+- **C3**: A mix of `"pct"` and `"none"` → treat `"none"` as 0% change.
+- **C4**: Invalid combination of `"mask"` and `"none"` → raise error.
+- **C5**: Invalid combination of `"mask"` and `"pct"` → raise error.
+
+##### Return:
+- `rule_id`: one of `"C0"`, `"C1"`, `"C2"`, `"C3"`.
+- `parsed_info`: currently unused; reserved for future use.
+
+**Why this matters:** It ensures that the per-polygon rules are logically and numerically valid before applying them to raster data.
+
+---
+
+#### C.3) Execute Rule Validation
+
+Code block to invoke the above logic:
+
+```python
+check_crs_match(gdf_mask, rules, ucp_folder, fractions_folder)
+
+try:
+    rule_id, parsed_info = parse_rules_from_mask(gdf_mask, rules)
+except ValueError as e:
+    print("Rule validation failed:", e)
+    raise
+```
+
+If the check passes, `rule_id` is used to direct the next phase of processing.
+
+
 ---
 
 ## ⚙️ Functionality Details
