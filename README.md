@@ -57,7 +57,7 @@ This section imports all the necessary Python libraries required for geospatial 
 
 > These libraries form the foundation of the layer simulator and enable seamless integration of vector attributes into raster processing workflows.
 
----
+
 
 ### B) Import Input Data
 
@@ -139,7 +139,7 @@ output_folder = "./output"
 
 **Output:** A path where the final masked or adjusted raster layers will be written.
 
----
+
 
 ### C) Parse Vector Mask Attributes and Check Rules
 
@@ -199,6 +199,64 @@ except ValueError as e:
 ```
 
 If the check passes, `rule_id` is used to direct the next phase of processing.
+
+## D) Apply Mask Rule
+
+This step performs raster updates using fixed values from the vector layer. It only applies when the rule set has been classified as **C1** (masking).
+
+### D.1) Mask Individual Raster with Vector Attributes
+
+Function: `apply_masking(gdf, raster_path, attr_name, output_path)`
+
+This function updates a raster layer using fixed values taken from each polygon in the vector dataset.
+
+- Reads the input raster.
+- Iterates over all vector features.
+- Rasterizes each polygon geometry.
+- Replaces the corresponding raster pixels with the polygon's attribute value.
+- Writes the modified raster to the output path.
+
+Example logic:
+
+```python
+with rasterio.open(raster_path) as src:
+    data = src.read(1)
+    for idx, row in gdf.iterrows():
+        value = row[attr_name]
+        mask_arr = rasterize([(row.geometry, 1)], ...)
+        data = np.where(mask_arr == 1, value, data)
+```
+
+If the raster contains a NoData value, it is preserved throughout the operation.
+
+
+### D.2) Apply Masking to All Relevant Layers
+
+Function: `apply_mask_rule_all(gdf, rules, ucp_folder, fractions_folder, output_folder)`
+
+This function loops over all layers defined in the rules and applies masking to each one with a rule of `"mask"`.
+
+- Automatically determines the raster source folder:
+  - Fraction layers (prefix `F_`) → `fractions_folder`
+  - UCP layers → `ucp_folder`
+- Constructs input and output paths for each file.
+- Calls `apply_masking()` for each valid layer.
+
+
+### D.3) Run Masking Based on Rule ID
+
+The rule type is checked before running masking logic. Masking is only executed if the detected rule type is `C1`.
+
+```python
+if rule_id in {"C1"}:
+    apply_mask_rule_all(gdf_mask, rules, ucp_folder, fractions_folder, output_folder)
+```
+
+Resulting rasters are saved with the suffix `_mask.tif` in the `./output` directory.
+
+
+**Why this matters:**  
+This step allows per-polygon attribute values to directly overwrite raster pixels. It is used in planning scenarios where each land unit is prescribed a deterministic outcome.
 
 ---
 
