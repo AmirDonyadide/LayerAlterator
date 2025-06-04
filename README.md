@@ -200,11 +200,11 @@ except ValueError as e:
 
 If the check passes, `rule_id` is used to direct the next phase of processing.
 
-## D) Apply Mask Rule
+### D) Apply Mask Rule
 
 This step performs raster updates using fixed values from the vector layer. It only applies when the rule set has been classified as **C1** (masking).
 
-### D.1) Mask Individual Raster with Vector Attributes
+#### D.1) Mask Individual Raster with Vector Attributes
 
 Function: `apply_masking(gdf, raster_path, attr_name, output_path)`
 
@@ -230,7 +230,7 @@ with rasterio.open(raster_path) as src:
 If the raster contains a NoData value, it is preserved throughout the operation.
 
 
-### D.2) Apply Masking to All Relevant Layers
+#### D.2) Apply Masking to All Relevant Layers
 
 Function: `apply_mask_rule_all(gdf, rules, ucp_folder, fractions_folder, output_folder)`
 
@@ -243,7 +243,7 @@ This function loops over all layers defined in the rules and applies masking to 
 - Calls `apply_masking()` for each valid layer.
 
 
-### D.3) Run Masking Based on Rule ID
+#### D.3) Run Masking Based on Rule ID
 
 The rule type is checked before running masking logic. Masking is only executed if the detected rule type is `C1`.
 
