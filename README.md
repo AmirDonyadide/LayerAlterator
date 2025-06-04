@@ -180,19 +180,7 @@ This function updates a raster layer using fixed values taken from each polygon 
 - Replaces the corresponding raster pixels with the polygon's attribute value.
 - Writes the modified raster to the output path.
 
-Example logic:
-
-```python
-with rasterio.open(raster_path) as src:
-    data = src.read(1)
-    for idx, row in gdf.iterrows():
-        value = row[attr_name]
-        mask_arr = rasterize([(row.geometry, 1)], ...)
-        data = np.where(mask_arr == 1, value, data)
-```
-
 If the raster contains a NoData value, it is preserved throughout the operation.
-
 
 #### D.2) Apply Masking to All Relevant Layers
 
