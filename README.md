@@ -24,18 +24,6 @@
 
 ### A) Import Libraries
 
-```python
-import os
-import json
-import geopandas as gpd
-import pandas as pd
-import rasterio
-import numpy as np
-from rasterio.mask import mask
-from rasterio.features import rasterize
-from shapely.geometry import mapping
-```
-
 This section imports all the necessary Python libraries required for geospatial raster-vector operations, numerical computations, and file handling.
 
 #### Standard Libraries
