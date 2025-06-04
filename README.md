@@ -57,6 +57,8 @@ This section imports all the necessary Python libraries required for geospatial 
 
 > These libraries form the foundation of the layer simulator and enable seamless integration of vector attributes into raster processing workflows.
 
+---
+
 ### B) Import Input Data
 
 This section prepares all necessary input files for the simulation process, including vector masks, raster layers, operational rules, and the output path.
@@ -137,11 +139,11 @@ output_folder = "./output"
 
 **Output:** A path where the final masked or adjusted raster layers will be written.
 
+---
+
 ### C) Parse Vector Mask Attributes and Check Rules
 
 This step validates that all input data aligns spatially and logically before performing raster processing.
-
----
 
 #### C.1) Check CRS Consistency
 
@@ -156,7 +158,6 @@ This function verifies that the Coordinate Reference System (CRS) of every raste
 
 **Why this matters:** Spatial misalignment can lead to incorrect rasterization or masking.
 
----
 
 #### C.2) Parse and Validate Rules
 
@@ -182,7 +183,6 @@ This function determines the processing category for the simulation based on the
 
 **Why this matters:** It ensures that the per-polygon rules are logically and numerically valid before applying them to raster data.
 
----
 
 #### C.3) Execute Rule Validation
 
@@ -199,7 +199,6 @@ except ValueError as e:
 ```
 
 If the check passes, `rule_id` is used to direct the next phase of processing.
-
 
 ---
 
