@@ -486,8 +486,13 @@ def apply_pct_ucp(
             pct_value = 0.0
             if rule_type == "pct":
                 val = row.get(attr_name)
-                if val is not None and not np.isnan(val):
-                    pct_value = val
+                try:
+                    val = float(val)
+                    if not np.isnan(val):
+                        pct_value = val
+                except (ValueError, TypeError):
+                    print(f"Warning: Skipping non-numeric value in feature {idx}: {val}")
+                    continue
 
             factor = 1 + (pct_value / 100.0)
             print(attr_name, rule_type, pct_value, factor)

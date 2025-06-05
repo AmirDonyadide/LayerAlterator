@@ -1,0 +1,14 @@
+{
+    "TCH.tif": "none",
+    "IMD.tif": "mask",
+    "BH.tif": "none",
+    "BSF.tif": "mask",
+    "SVF.tif": "mask",
+    "F_AC.tif": "none",
+    "F_S.tif": "mask",
+    "F_M.tif": "none",
+    "F_BS.tif": "mask",
+    "F_G.tif": "none",
+    "F_TV.tif": "mask",
+    "F_W.tif":"mask"
+}
