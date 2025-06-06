@@ -1,26 +1,111 @@
 # 🛰️ LayerAlterator
 
-**LayerAlterator** is a Python-based geospatial simulation tool for programmatically modifying raster datasets within vector-defined zones, based on attribute-driven rules. It’s tailored for use in urban planning, climate adaptation modeling, and land cover change simulation.
+**LayerAlterator** is a Python-based geospatial simulation tool that programmatically modifies raster datasets using vector-defined spatial rules. Developed for applications in urban planning, climate adaptation, and land-use forecasting, it provides a lightweight engine for simulating "what-if" scenarios such as densification, reforestation, or infrastructure development.
+
+The tool is rule-driven and applies transformations based on polygon attributes specified in a GeoPackage, GeoJSON, or Shapefile. It supports both absolute value substitution (masking) and relative change (percentage adjustment), and it ensures normalization of fractional layers, data consistency, and CRS alignment. 
+
+Designed to be modular, testable, and easily extensible, LayerAlterator is suited for integration into Digital Twin platforms or stand-alone exploratory simulations.
 
 ---
 
 ## 📌 Overview
 
+- Apply attribute-based transformations to raster layers using vector masks
+- Designed for climate-sensitive urban simulations (e.g., UHI)
+- Supports both deterministic (mask) and proportional (pct) rule logic
+- Ensures CRS alignment, NoData preservation, and normalization
+- Modular Python architecture with Jupyter support
+- Ready for integration into Digital Twins and scenario prototyping
+
 ---
 
 ## 🔍 Key Features
+
+- ✅ Rule-driven raster processing with vector mask input
+- ✅ Support for `mask`, `pct`, and `none` rule types
+- ✅ Validation of polygon attributes and logical conditions
+- ✅ Automated CRS consistency check for all input files
+- ✅ Pixel-wise normalization for land cover fraction layers
+- ✅ Modular function-based architecture (`layer_alterator`, `apply_masking`, etc.)
+- ✅ Clear output management with `_mask.tif` / `_pct.tif` suffixing
+- ✅ Visual inspection-ready outputs (QGIS compatible)
+- ✅ Jupyter-integrated test suite for debugging and demonstration
+- ✅ Lightweight and dependency-lean (only open-source libraries)
 
 ---
 
 ## 🗂️ Repository Structure
 
+```
+LayerAlterator/
+├── functions.py                    # Main processing functions
+├── test_functions.ipynb            # Jupyter notebook for running and testing all modules
+├── requirements.txt                # Required libraries
+├── test_data/                      # Contains input/output examples for all test functions
+│   ├── fun_1/ ... fun_11/          # Each folder corresponds to a separate test case
+│       ├── vector/                 # Polygon files (.gpkg, .shp, .geojson)
+│       ├── ucps/                   # UCP raster inputs (e.g., IMD.tif, BSF.tif)
+│       ├── lc_fractions/           # Fractional raster inputs (F_*.tif)
+│       ├── operation_rules_*.json  # Rule files per test case
+│       └── output/                 # Outputs produced (_mask.tif, _pct.tif)
+├── README.md                       # This file
+```
 ---
 
 ## 📥 Input Data Structure
 
+The input data must follow a clearly defined folder and naming convention:
+
+```
+test_data/fun_X/
+├── vector/                  # Vector mask (one of .gpkg, .geojson, .shp)
+├── ucps/                    # UCP raster files: IMD.tif, BSF.tif, etc.
+├── lc_fractions/            # Fraction rasters: F_AC.tif, F_UF.tif, etc.
+├── operation_rules_*.json   # JSON rule file
+```
+
+### Vector Mask
+- File formats supported: `.gpkg`, `.geojson`, `.shp`
+- Must contain attribute fields matching the raster names (e.g., `IMD`, `BSF`, `F_AC`, `F_UF`)
+- Used to define polygon-level logic
+
+### Raster Inputs
+- UCP folder: stores general-purpose raster layers (e.g., building metrics)
+- Fraction folder: land cover layers, prefixed with `F_`, must sum to 1 per pixel
+
+### Rules File
+- JSON file defining rules per raster layer:
+  - `"mask"`: assign fixed value from vector
+  - `"pct"`: apply percentage change
+  - `"none"`: skip layer
+
+Example `operation_rules_C3.json`:
+```json
+{
+  "IMD.tif": "pct",
+  "BSF.tif": "pct",
+  "F_AC.tif": "mask",
+  "F_UF.tif": "mask"
+}
+```
+
 ---
 
-## 📥 Documentation
+## 📥 Documentation 
+
+Each function is fully documented in the source code and in `test_functions.ipynb`. The main steps and responsibilities are:
+
+| Step | Function(s) | Description |
+|------|-------------|-------------|
+| 1️⃣ Load vector | `gpd.read_file()` | Reads polygon mask with attributes |
+| 2️⃣ Load rasters | `rasterio.open()` | Loads UCP/fraction TIFF files |
+| 3️⃣ Parse rules | `parse_rules_from_mask()` | Classifies into rule sets (C0–C5) |
+| 4️⃣ Check CRS | `check_crs_match()` | Validates spatial consistency |
+| 5️⃣ Apply Mask | `apply_mask_rule_all()` | Runs fixed-value update for rule C1 |
+| 6️⃣ Apply Pct | `apply_pct_all()` | Runs relative-change updates for rule C2/C3 |
+| 7️⃣ Save Output | `rasterio.write()` | Writes final TIFFs to output folder |
+
+Each step is independently testable and includes appropriate error handling and logging.
 
 ### A) Import Libraries
 
@@ -279,24 +364,115 @@ This mechanism supports spatially variable simulation of urban or ecological cha
 
 ## ⚙️ Functionality Details
 
+The tool is driven by the central `layer_alterator()` function, which executes the full pipeline:
+
+```python
+layer_alterator(
+    vector_mask_path,
+    ucp_folder,
+    fractions_folder,
+    rules_path,
+    output_folder
+)
+```
+
+### Logic Flow:
+1. Load and validate the vector mask.
+2. Read the JSON rule file and determine processing type (C0–C5).
+3. Check CRS consistency across all input rasters.
+4. Based on the rule type:
+   - Run `apply_mask_rule_all()` for C1
+   - Run `apply_pct_all()` for C2/C3
+5. Each updated raster is saved with a suffix `_mask.tif` or `_pct.tif`.
+
+### Function Summary:
+- `parse_rules_from_mask()` — classify rule type (C0–C5)
+- `check_crs_match()` — ensure raster and vector alignment
+- `apply_masking()` — per-layer fixed value masking
+- `apply_pct_ucp()` — apply percentage to UCP raster
+- `apply_pct_all_fractions()` — apply and normalize fractions
+- `apply_mask_rule_all()` — apply masking to all layers
+- `apply_pct_all()` — coordinate UCP + fraction updates
+
+This modular design allows the user to plug-and-play functionality, extend scenarios, or chain processing steps across simulations.
+
 ---
 
 ## 🚀 Quick Start
+
+1. **Install dependencies**:
+```bash
+pip install -r requirements.txt
+```
+
+2. **Prepare input data**:
+- Organize a folder (e.g., `test_data/fun_11/`) with:
+  - `vector/` containing a `.gpkg`, `.geojson`, or `.shp`
+  - `ucps/` and `lc_fractions/` containing raster `.tif` files
+  - a rule file like `operation_rules_C3.json`
+
+3. **Run from Python or notebook**:
+```python
+from functions import layer_alterator
+
+layer_alterator(
+    vector_mask_path="./test_data/fun_11/vector/test_mask.geojson",
+    ucp_folder="./test_data/fun_11/ucps",
+    fractions_folder="./test_data/fun_11/lc_fractions",
+    rules_path="./test_data/fun_11/operation_rules_C3.json",
+    output_folder="./test_data/fun_11/output"
+)
+```
+
+4. **Inspect outputs** in the specified folder. Output files will have `_mask.tif` or `_pct.tif` suffixes.
 
 ---
 
 ## 🧪 Sample Output
 
+After running the tool, the `output/` folder will contain:
+
+```
+output/
+├── IMD_pct.tif
+├── BSF_pct.tif
+├── F_AC_mask.tif
+├── F_UF_mask.tif
+```
+
+- These files represent the updated rasters after applying the rules.
+- You can open them in QGIS for visual inspection or use `rasterio`/`gdalinfo` for stats.
+
+📌 All processing respects NoData, alignment, and normalization constraints.
 
 ---
 
 ## 💡 Applications
 
+LayerAlterator was developed to support spatially explicit simulation needs in urban and environmental modeling contexts. Example applications include:
+
+- 🏙️ Urban densification studies
+- 🌳 Reforestation or green infrastructure planning
+- 🌡️ Urban Heat Island mitigation simulation
+- 📊 Preprocessing for Local Climate Zone modeling
+- 🧪 Scenario testing in Digital Twin platforms
+- 🛰️ Land cover change prototype modeling
+
+The flexible rule-driven engine allows users to test policy interventions, simulate transformation hypotheses, or prototype planning alternatives with minimal computational overhead.
 
 ---
 
 ## 🧰 Development Roadmap
 
+Planned or potential enhancements include:
+
+- 🔁 Batch rule scenario support (loop over multiple JSON rule sets)
+- 🌐 GUI or web interface for non-technical users
+- 🧠 Smart validation for conflicting or overlapping polygon logic
+- 📦 Packaged CLI tool version for deployment
+- 🧩 Integration hooks for use in Digital Twin APIs or dashboards
+
+Feature suggestions and contributions are welcome!
 
 ---
 
