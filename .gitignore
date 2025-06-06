@@ -1,10 +1,5 @@
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-env/
-venv/
 .DS_Store
 .ipynb_checkpoints/
 output/
-simulation_test_sites/
+input_data_for_layer_alterator/
