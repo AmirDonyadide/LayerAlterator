@@ -1,4 +1,4 @@
-# 🛰️ LayerAlterator
+# LayerAlterator
 
 **LayerAlterator** is a Python-based geospatial simulation tool that programmatically modifies raster datasets using vector-defined spatial rules. Developed for applications in urban planning, climate adaptation, and land-use forecasting, it provides a lightweight engine for simulating "what-if" scenarios such as densification, reforestation, or infrastructure development.
 
@@ -8,7 +8,7 @@ Designed to be modular, testable, and easily extensible, LayerAlterator is suite
 
 ---
 
-## 📌 Overview
+## Overview
 
 - Apply attribute-based transformations to raster layers using vector masks
 - Designed for climate-sensitive urban simulations (e.g., UHI)
@@ -19,22 +19,22 @@ Designed to be modular, testable, and easily extensible, LayerAlterator is suite
 
 ---
 
-## 🔍 Key Features
+## Key Features
 
-- ✅ Rule-driven raster processing with vector mask input
-- ✅ Support for `mask`, `pct`, and `none` rule types
-- ✅ Validation of polygon attributes and logical conditions
-- ✅ Automated CRS consistency check for all input files
-- ✅ Pixel-wise normalization for land cover fraction layers
-- ✅ Modular function-based architecture (`layer_alterator`, `apply_masking`, etc.)
-- ✅ Clear output management with `_mask.tif` / `_pct.tif` suffixing
-- ✅ Visual inspection-ready outputs (QGIS compatible)
-- ✅ Jupyter-integrated test suite for debugging and demonstration
-- ✅ Lightweight and dependency-lean (only open-source libraries)
+- Rule-driven raster processing with vector mask input
+- Support for `mask`, `pct`, and `none` rule types
+- Validation of polygon attributes and logical conditions
+- Automated CRS consistency check for all input files
+- Pixel-wise normalization for land cover fraction layers
+- Modular function-based architecture (`layer_alterator`, `apply_masking`, etc.)
+- Clear output management with `_mask.tif` / `_pct.tif` suffixing
+- Visual inspection-ready outputs (QGIS compatible)
+- Jupyter-integrated test suite for debugging and demonstration
+- Lightweight and dependency-lean (only open-source libraries)
 
 ---
 
-## 🗂️ Repository Structure
+## Repository Structure
 
 ```
 LayerAlterator/
@@ -52,7 +52,7 @@ LayerAlterator/
 ```
 ---
 
-## 📥 Input Data Structure
+## Input Data Structure
 
 The input data must follow a clearly defined folder and naming convention:
 
@@ -91,19 +91,19 @@ Example `operation_rules_C3.json`:
 
 ---
 
-## 📥 Documentation 
+## Documentation 
 
 Each function is fully documented in the source code and in `test_functions.ipynb`. The main steps and responsibilities are:
 
 | Step | Function(s) | Description |
 |------|-------------|-------------|
-| 1️⃣ Load vector | `gpd.read_file()` | Reads polygon mask with attributes |
-| 2️⃣ Load rasters | `rasterio.open()` | Loads UCP/fraction TIFF files |
-| 3️⃣ Parse rules | `parse_rules_from_mask()` | Classifies into rule sets (C0–C5) |
-| 4️⃣ Check CRS | `check_crs_match()` | Validates spatial consistency |
-| 5️⃣ Apply Mask | `apply_mask_rule_all()` | Runs fixed-value update for rule C1 |
-| 6️⃣ Apply Pct | `apply_pct_all()` | Runs relative-change updates for rule C2/C3 |
-| 7️⃣ Save Output | `rasterio.write()` | Writes final TIFFs to output folder |
+| 1️ Load vector | `gpd.read_file()` | Reads polygon mask with attributes |
+| 2️ Load rasters | `rasterio.open()` | Loads UCP/fraction TIFF files |
+| 3️ Parse rules | `parse_rules_from_mask()` | Classifies into rule sets (C0–C5) |
+| 4️ Check CRS | `check_crs_match()` | Validates spatial consistency |
+| 5️ Apply Mask | `apply_mask_rule_all()` | Runs fixed-value update for rule C1 |
+| 6️ Apply Pct | `apply_pct_all()` | Runs relative-change updates for rule C2/C3 |
+| 7️ Save Output | `rasterio.write()` | Writes final TIFFs to output folder |
 
 Each step is independently testable and includes appropriate error handling and logging.
 
@@ -362,7 +362,7 @@ This mechanism supports spatially variable simulation of urban or ecological cha
 
 ---
 
-## ⚙️ Functionality Details
+## Functionality Details
 
 The tool is driven by the central `layer_alterator()` function, which executes the full pipeline:
 
@@ -398,7 +398,7 @@ This modular design allows the user to plug-and-play functionality, extend scena
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 1. **Install dependencies**:
 ```bash
@@ -428,7 +428,7 @@ layer_alterator(
 
 ---
 
-## 🧪 Sample Output
+## Sample Output
 
 After running the tool, the `output/` folder will contain:
 
@@ -447,7 +447,7 @@ output/
 
 ---
 
-## 💡 Applications
+## Applications
 
 LayerAlterator was developed to support spatially explicit simulation needs in urban and environmental modeling contexts. Example applications include:
 
@@ -462,21 +462,21 @@ The flexible rule-driven engine allows users to test policy interventions, simul
 
 ---
 
-## 🧰 Development Roadmap
+## Development Roadmap
 
 Planned or potential enhancements include:
 
-- 🔁 Batch rule scenario support (loop over multiple JSON rule sets)
-- 🌐 GUI or web interface for non-technical users
-- 🧠 Smart validation for conflicting or overlapping polygon logic
-- 📦 Packaged CLI tool version for deployment
-- 🧩 Integration hooks for use in Digital Twin APIs or dashboards
+- Batch rule scenario support (loop over multiple JSON rule sets)
+- GUI or web interface for non-technical users
+- Smart validation for conflicting or overlapping polygon logic
+- Packaged CLI tool version for deployment
+- Integration hooks for use in Digital Twin APIs or dashboards
 
 Feature suggestions and contributions are welcome!
 
 ---
 
-## 🧑‍💼 Author
+## Author
 
 **Amirhossein Donyadidegan**  
 MSc Geoinformatics Engineering  
@@ -485,7 +485,7 @@ Politecnico di Milano
 
 ---
 
-## 🧑‍🏫 Supervisor
+## Supervisor
 
 **Dr. Daniele Oxoli**  
 Assistant Professor, Politecnico di Milano  
@@ -493,7 +493,7 @@ Assistant Professor, Politecnico di Milano
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the **MIT License**.  
 See the [LICENSE](LICENSE) file for details.
