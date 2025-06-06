@@ -1,0 +1,14 @@
+{
+    "TCH.tif": "pct",
+    "IMD.tif": "none",
+    "BH.tif": "none",
+    "BSF.tif": "none",
+    "SVF.tif": "none",
+    "F_AC.tif": "none",
+    "F_S.tif": "pct",
+    "F_M.tif": "none",
+    "F_BS.tif": "pct",
+    "F_G.tif": "pct",
+    "F_TV.tif": "pct",
+    "F_W.tif":"none"
+}

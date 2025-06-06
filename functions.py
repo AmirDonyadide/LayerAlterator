@@ -410,16 +410,8 @@ def is_fraction_layer(layer_name):
     return layer_name.startswith("F_")
 
 
-def apply_pct_ucp(
-    gdf,
-    raster_path,
-    attr_name,
-    rule_type,
-    output_path,
-    exceed_handling="clip",
-    zero_handling="raise",
-    zero_value=0.01
-):
+def apply_pct_ucp(gdf, raster_path, attr_name, rule_type, output_path,
+                  exceed_handling="clip", zero_handling="raise", zero_value=0.01):
     """
     Apply per-polygon percentage change to UCP raster pixels using vector attributes.
 
@@ -464,13 +456,19 @@ def apply_pct_ucp(
     np.ndarray
         The modified raster data as a NumPy array.
     """
+    # --- CRS Check ---
+    with rasterio.open(raster_path) as src:
+        raster_crs = src.crs
+    if not gdf.crs == raster_crs:
+        raise ValueError(f"CRS mismatch: Vector CRS is {gdf.crs}, but raster CRS is {raster_crs}. "
+                         f"Please reproject your GeoDataFrame to match the raster CRS before proceeding.")
 
     with rasterio.open(raster_path) as src:
         data = src.read(1).astype(np.float32)
         meta = src.meta.copy()
         nodata_val = src.nodata
 
-        # Preserve NoData metadata
+        # Preserve NoData value in output metadata
         if nodata_val is not None:
             meta['nodata'] = nodata_val
             nodata_mask = (data == nodata_val)
@@ -481,23 +479,16 @@ def apply_pct_ucp(
             print("No explicit NoData value defined in the input raster.")
             nodata_mask = None
 
-        # Process each polygon feature
         for idx, row in gdf.iterrows():
             pct_value = 0.0
             if rule_type == "pct":
                 val = row.get(attr_name)
-                try:
-                    val = float(val)
-                    if not np.isnan(val):
-                        pct_value = val
-                except (ValueError, TypeError):
-                    print(f"Warning: Skipping non-numeric value in feature {idx}: {val}")
-                    continue
+                if val is not None and not np.isnan(val):
+                    pct_value = val
 
             factor = 1 + (pct_value / 100.0)
             print(attr_name, rule_type, pct_value, factor)
 
-            # Rasterize polygon geometry as a binary mask
             mask_arr = rasterize(
                 [(row.geometry, 1)],
                 out_shape=src.shape,
@@ -513,17 +504,20 @@ def apply_pct_ucp(
                     zero_mask = zero_mask & (~nodata_mask)
                 data = np.where(zero_mask, zero_value, data)
 
-            # Mask only valid (non-NoData) areas
+            # Update only non-nodata pixels within the mask
             if nodata_mask is not None:
                 update_mask = (mask_arr == 1) & (~nodata_mask)
             else:
                 update_mask = (mask_arr == 1)
 
-            # Apply the percentage modification
             data = np.where(update_mask, data * factor, data)
 
-        # Post-processing: handle out-of-bound values
-        valid_data = data[~nodata_mask] if nodata_mask is not None else data
+        # Clip, normalize, or ignore values outside [0,1]
+        if nodata_mask is not None:
+            valid_data = data[~nodata_mask]
+        else:
+            valid_data = data
+
         min_val = np.min(valid_data)
         max_val = np.max(valid_data)
 
@@ -532,26 +526,31 @@ def apply_pct_ucp(
                   f"Handling method: {exceed_handling}.")
 
             if exceed_handling == "clip":
-                data = np.where(~nodata_mask, np.clip(data, 0.0, 1.0), data) if nodata_mask is not None else np.clip(data, 0.0, 1.0)
+                if nodata_mask is not None:
+                    data = np.where(~nodata_mask, np.clip(data, 0.0, 1.0), data)
+                else:
+                    data = np.clip(data, 0.0, 1.0)
 
             elif exceed_handling == "normalize":
                 if max_val != min_val:
                     scaled = (valid_data - min_val) / (max_val - min_val)
-                    data = np.where(~nodata_mask, scaled, data) if nodata_mask is not None else scaled
+                    if nodata_mask is not None:
+                        data = np.where(~nodata_mask, scaled, data)
+                    else:
+                        data = scaled
                 else:
                     data[:] = 0.0
 
             elif exceed_handling == "ignore":
-                pass  # No action taken
-
+                pass
             else:
                 raise ValueError("Invalid exceed_handling value. Use 'clip', 'normalize', or 'ignore'.")
 
-        # Restore NoData values in output
+        # Re-apply NoData to output
         if nodata_mask is not None:
             data = np.where(nodata_mask, nodata_val, data)
-
-        # Save modified raster
+        #make output path if it does not exist
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
         with rasterio.open(output_path, 'w', **meta) as dst:
             dst.write(data, 1)
 
