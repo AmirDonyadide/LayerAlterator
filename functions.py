@@ -5,6 +5,7 @@ import rasterio
 import numpy as np
 from rasterio.features import rasterize
 import geopandas as gpd
+import json
 
 
 # --- B) FUNCTIONS ---
@@ -801,3 +802,102 @@ def check_imd_bsf_consistency(output_folder, imd_filename="IMD_pct.tif", bsf_fil
                   "Consider adjusting the 'pct' attributes in the vector mask.")
         else:
             print("Check passed: All pixels satisfy IMD ≥ BSF.")
+
+# Primary function to run all processing steps
+def layer_alterator(
+    vector_mask_path,
+    rules_path,
+    ucps_folder,
+    fractions_folder,
+    output_folder,
+    layer_name=None
+):
+    """
+    Execute full layer alteration workflow based on vector mask and rule definitions.
+
+    This function:
+    - Loads a vector mask (GPKG, GeoJSON, Shapefile)
+    - Loads rules from a JSON file
+    - Validates and parses the rule configuration
+    - Applies masking (C1) or percentage adjustment (C2, C3)
+    - Verifies IMD ≥ BSF constraint if relevant
+    - Returns a processing summary
+
+    Parameters:
+    -----------
+    vector_mask_path : str
+        Path to the vector file (.gpkg, .geojson, .shp).
+
+    rules_path : str
+        Path to a JSON file defining raster layer rules.
+
+    ucp_folder : str
+        Folder containing UCP raster files.
+
+    fractions_folder : str
+        Folder containing fraction raster files (e.g., "F_AC.tif").
+
+    output_folder : str
+        Folder where output rasters will be written.
+
+    layer_name : str, optional
+        GPKG layer name if using a .gpkg file.
+
+    Returns:
+    --------
+    dict
+        Summary dictionary containing:
+        - rule_id: Applied rule code
+        - masking_applied: bool
+        - pct_applied: bool
+        - imd_bsf_check: str ("passed", "failed", or "skipped")
+    """
+
+    summary = {
+        "rule_id": None,
+        "masking_applied": False,
+        "pct_applied": False,
+        "imd_bsf_check": "skipped"
+    }
+
+    # Step 1: Load vector mask
+    gdf_mask = load_vector_mask(vector_mask_path, layer_name)
+
+    # Step 2: Load JSON rules
+    with open(rules_path) as f:
+        rules = json.load(f)
+
+    # Step 3: Parse and validate rules
+    try:
+        rule_id, _ = parse_rules_from_mask(gdf_mask, rules)
+        summary["rule_id"] = rule_id
+    except ValueError as e:
+        print("Rule validation failed:", e)
+        raise
+
+    # Step 4: Apply rule-based processing
+    if rule_id == "C1":
+        print("Applying masking...")
+        apply_mask_rule_all(gdf_mask, rules, ucps_folder, fractions_folder, output_folder)
+        summary["masking_applied"] = True
+
+    elif rule_id in {"C2", "C3"}:
+        print("Applying percentage-based adjustments...")
+        apply_pct_all(gdf_mask, rules, ucps_folder, fractions_folder, output_folder)
+        summary["pct_applied"] = True
+
+        # Step 5: Consistency check (IMD ≥ BSF)
+        print("Running IMD ≥ BSF consistency check...")
+        try:
+            check_imd_bsf_consistency(output_folder)
+            summary["imd_bsf_check"] = "passed"
+        except Exception as e:
+            print("Consistency check failed:", e)
+            summary["imd_bsf_check"] = "failed"
+
+    else:
+        print("No processing applied (rule:", rule_id, ")")
+
+    return summary
+
+# --- End of functions.py ---
