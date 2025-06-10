@@ -230,6 +230,7 @@ Function: `parse_rules_from_mask(gdf, rules)`
 This function determines the processing category for the simulation based on the content of the rules JSON file and the attributes found in each polygon.
 
 ##### Supported Rule Categories:
+![Rules Combination Table](rules_combination_table.jpg)
 
 - **C0**: All layers set to `"none"` → no processing required.
 - **C1**: All layers set to `"mask"` → must validate:
